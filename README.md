@@ -16,14 +16,26 @@ An automated cloud data pipeline built on AWS utilizing **Amazon S3**, **AWS Glu
 
 ```text
 thornquist-outfitters-data-lake/
+├── .gitignore
+├── deploy.py
+├── README.md
+├── cloudformation/
+│   └── cloudformation_thornquist_infrastructure1.yaml
 ├── data/
-│   ├── thornquist_pos_sales.csv
+│   ├── thornquist_customers.txt
 │   ├── thornquist_ecommerce_orders.json
-│   └── thornquist_customers.txt
+│   └── thornquist_pos_sales.csv
+├── report/
+│   └── S3 Datalake Report.docx
 ├── scripts/
 │   └── glue_etl_pipeline.py
-├── deploy.py
-└── README.md
+└── sql/
+    ├── 01_raw_pos_data_preview.sql
+    ├── 02_create_curated_sales_table.sql
+    ├── 03_msck_repair_curated_sales.sql
+    ├── 04_preview_curated_sales.sql
+    ├── 05_create_sales_by_category_view.sql
+    └── 06_query_sales_by_category.sql
 ```
 
 ---
