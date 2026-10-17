@@ -7,8 +7,6 @@ BUCKET_NAME = "thornquist-outfitters-am-rob-alx"
 REGION = "us-east-1"
 DATABASE = "thornquist_db"
 GLUE_JOB_NAME = "thornquist-etl-pipeline"
-AWS_ACCOUNT_ID = "7850-6958-3533"
-ROLE_ARN = f"arn:aws:iam::{AWS_ACCOUNT_ID}:role/LabRole"
 
 s3 = boto3.client('s3', region_name=REGION)
 glue = boto3.client('glue', region_name=REGION)
@@ -22,10 +20,8 @@ def upload_assets():
     s3.upload_file("scripts/glue_etl_pipeline.py", BUCKET_NAME, "scripts/glue_etl_pipeline.py")
     print("✅ Files successfully uploaded to S3!")
 
-def create_glue_database_and_job():
-    print("🗄️ [2/5] Ensuring Glue Database and ETL Job exist...")
-    
-    # 1. Database
+def create_glue_database():
+    print("🗄️ [2/5] Ensuring Glue Database exists...")
     try:
         glue.create_database(
             DatabaseInput={
@@ -33,51 +29,10 @@ def create_glue_database_and_job():
                 'Description': 'Conformed and Curated Data Catalog for Thornquist Outfitters.'
             }
         )
-        print("✅ Glue Database created.")
+        print("✅ Glue Database created successfully.")
     except Exception as e:
         if 'AlreadyExistsException' in str(e):
-            print("ℹ️ Glue Database already exists.")
-        else:
-            raise e
-
-    # 2. Glue Job
-    try:
-        glue.create_job(
-            Name=GLUE_JOB_NAME,
-            Role=ROLE_ARN,
-            Command={
-                'Name': 'glueetl',
-                'ScriptLocation': f's3://{BUCKET_NAME}/scripts/glue_etl_pipeline.py',
-                'PythonVersion': '3'
-            },
-            GlueVersion='4.0',
-            NumberOfWorkers=2,
-            WorkerType='G.1X',
-            DefaultArguments={
-                '--job-bookmark-option': 'job-bookmark-disable',
-                '--enable-metrics': 'true',
-                '--enable-continuous-cloudwatch-log': 'true',
-                '--TempDir': f's3://{BUCKET_NAME}/athena-results/temp/'
-            }
-        )
-        print("✅ Glue ETL Job created successfully.")
-    except Exception as e:
-        if 'AlreadyExistsException' in str(e):
-            print("ℹ️ Glue ETL Job already exists, updating configuration...")
-            glue.update_job(
-                JobName=GLUE_JOB_NAME,
-                JobUpdate={
-                    'Role': ROLE_ARN,
-                    'Command': {
-                        'Name': 'glueetl',
-                        'ScriptLocation': f's3://{BUCKET_NAME}/scripts/glue_etl_pipeline.py',
-                        'PythonVersion': '3'
-                    },
-                    'GlueVersion': '4.0',
-                    'NumberOfWorkers': 2,
-                    'WorkerType': 'G.1X'
-                }
-            )
+            print("ℹ️ Glue Database already exists, proceeding...")
         else:
             raise e
 
@@ -156,7 +111,7 @@ def run_athena_queries():
 
 if __name__ == "__main__":
     upload_assets()
-    create_glue_database_and_job()
+    create_glue_database()
     run_glue_job()
     run_athena_queries()
     print("🎉 [5/5] All pipeline steps executed automatically from start to finish!")
