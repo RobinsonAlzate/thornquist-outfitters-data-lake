@@ -1,19 +1,20 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  Fully Automated CloudFormation Template for Thornquist Outfitters Data Lake.
+  AWS CloudFormation Template for Thornquist Outfitters Data Lake & ETL Architecture.
   Team: Ammar Al-naqeeb, Robinson Alzate Bedoya, Alexander Orsulak.
 
 Parameters:
-  AWSAccountId:
-    Type: String
-    Default: '7850-6958-3533'
-    Description: AWS Account ID. Change if deploying in a different account.
   BucketName:
     Type: String
     Default: 'thornquist-outfitters-am-rob-alx'
     Description: Standardized S3 Data Lake Bucket Name.
+  AWSAccountId:
+    Type: String
+    Default: '7850-6958-3533'
+    Description: AWS Account ID for IAM LabRole reference.
 
 Resources:
+  # 1. Primary S3 Data Lake Bucket
   DataLakeBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -25,18 +26,18 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
 
+  # 2. AWS Glue Data Catalog Database (Sin CatalogId explícito para evitar errores)
   ThornquistGlueDatabase:
     Type: AWS::Glue::Database
     Properties:
-      CatalogId: !Ref AWSAccountId
       DatabaseInput:
         Name: thornquist_db
-        Description: Data Catalog Database for Thornquist Outfitters.
+        Description: Conformed and Curated Data Catalog for Thornquist Outfitters.
 
+  # 3. Curated Sales Glue Catalog Table
   CuratedSalesTable:
     Type: AWS::Glue::Table
     Properties:
-      CatalogId: !Ref AWSAccountId
       DatabaseName: !Ref ThornquistGlueDatabase
       TableInput:
         Name: curated_sales
@@ -69,6 +70,7 @@ Resources:
           - Name: category
             Type: string
 
+  # 4. AWS Glue ETL Job
   ThornquistETLJob:
     Type: AWS::Glue::Job
     Properties:
@@ -88,7 +90,9 @@ Resources:
         '--TempDir': !Sub 's3://${BucketName}/athena-results/temp/'
 
 Outputs:
-  Bucket:
+  S3Bucket:
+    Description: Provisioned S3 Data Lake Bucket
     Value: !Ref DataLakeBucket
-  Database:
+  GlueDatabase:
+    Description: Created Glue Catalog Database
     Value: !Ref ThornquistGlueDatabase
