@@ -39,7 +39,7 @@ Raw_Legacy_Customers_node1792187154414 = glueContext.create_dynamic_frame.from_c
 # Script generated for node Change Schema (POS)
 ChangeSchema_node1792187349088 = ApplyMapping.apply(frame=Raw_POS_Sales_node1792187076762, mappings=[("order_id", "string", "order_id", "string"), ("sale_date", "string", "sale_date", "string"), ("customer_id", "string", "customer_id", "string"), ("product_id", "string", "product_id", "string"), ("product_name", "string", "product_name", "string"), ("category", "string", "category", "string"), ("region", "string", "province", "string"), ("currency", "string", "currency", "string"), ("unit_price", "double", "unit_price", "double"), ("quantity", "long", "quantity", "long")], transformation_ctx="ChangeSchema_node1792187349088")
 
-# Replaced gs_flatten with standard DataFrame operations (or direct mapping if schema matches)
+# Ecommerce Flatten & Mapping
 ecommerce_df = Raw_Ecommerce_Orders_node1792187131391.toDF()
 Flatten_node1792187997190 = DynamicFrame.fromDF(ecommerce_df, glueContext, "Flatten_node1792187997190")
 
