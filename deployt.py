@@ -7,23 +7,25 @@ BUCKET_NAME = "thornquist-outfitters-am-rob-alx"
 REGION = "us-east-1"
 DATABASE = "thornquist_db"
 GLUE_JOB_NAME = "thornquist-etl-pipeline"
+AWS_ACCOUNT_ID = "7850-6958-3533"
+ROLE_ARN = f"arn:aws:iam::{AWS_ACCOUNT_ID}:role/LabRole"
 
 s3 = boto3.client('s3', region_name=REGION)
 glue = boto3.client('glue', region_name=REGION)
 athena = boto3.client('athena', region_name=REGION)
 
 def upload_assets():
-    print("🚀 [1/4] Uploading raw data and scripts to S3...")
+    print("🚀 [1/5] Uploading raw data and scripts to S3...")
     s3.upload_file("data/thornquist_pos_sales.csv", BUCKET_NAME, "raw/pos/thornquist_pos_sales.csv")
     s3.upload_file("data/thornquist_ecommerce_orders.json", BUCKET_NAME, "raw/ecommerce/thornquist_ecommerce_orders.json")
     s3.upload_file("data/thornquist_customers.txt", BUCKET_NAME, "raw/legacy-customers/thornquist_customers.txt")
     s3.upload_file("scripts/glue_etl_pipeline.py", BUCKET_NAME, "scripts/glue_etl_pipeline.py")
     print("✅ Files successfully uploaded to S3!")
 
-def create_glue_database_and_tables():
-    print("🗄️ [2/4] Ensuring Glue Database and Tables exist...")
+def create_glue_database_and_job():
+    print("🗄️ [2/5] Ensuring Glue Database and ETL Job exist...")
     
-    # Create Database safely
+    # 1. Database
     try:
         glue.create_database(
             DatabaseInput={
@@ -31,15 +33,56 @@ def create_glue_database_and_tables():
                 'Description': 'Conformed and Curated Data Catalog for Thornquist Outfitters.'
             }
         )
-        print("✅ Glue Database created successfully.")
+        print("✅ Glue Database created.")
     except Exception as e:
         if 'AlreadyExistsException' in str(e):
-            print("ℹ️ Glue Database already exists, proceeding...")
+            print("ℹ️ Glue Database already exists.")
+        else:
+            raise e
+
+    # 2. Glue Job
+    try:
+        glue.create_job(
+            Name=GLUE_JOB_NAME,
+            Role=ROLE_ARN,
+            Command={
+                'Name': 'glueetl',
+                'ScriptLocation': f's3://{BUCKET_NAME}/scripts/glue_etl_pipeline.py',
+                'PythonVersion': '3'
+            },
+            GlueVersion='4.0',
+            NumberOfWorkers=2,
+            WorkerType='G.1X',
+            DefaultArguments={
+                '--job-bookmark-option': 'job-bookmark-disable',
+                '--enable-metrics': 'true',
+                '--enable-continuous-cloudwatch-log': 'true',
+                '--TempDir': f's3://{BUCKET_NAME}/athena-results/temp/'
+            }
+        )
+        print("✅ Glue ETL Job created successfully.")
+    except Exception as e:
+        if 'AlreadyExistsException' in str(e):
+            print("ℹ️ Glue ETL Job already exists, updating configuration...")
+            glue.update_job(
+                JobName=GLUE_JOB_NAME,
+                JobUpdate={
+                    'Role': ROLE_ARN,
+                    'Command': {
+                        'Name': 'glueetl',
+                        'ScriptLocation': f's3://{BUCKET_NAME}/scripts/glue_etl_pipeline.py',
+                        'PythonVersion': '3'
+                    },
+                    'GlueVersion': '4.0',
+                    'NumberOfWorkers': 2,
+                    'WorkerType': 'G.1X'
+                }
+            )
         else:
             raise e
 
 def run_glue_job():
-    print(f"⚙️ [3/4] Starting Glue ETL Job: {GLUE_JOB_NAME}...")
+    print(f"⚙️ [3/5] Starting Glue ETL Job: {GLUE_JOB_NAME}...")
     response = glue.start_job_run(JobName=GLUE_JOB_NAME)
     job_run_id = response['JobRunId']
     
@@ -58,7 +101,7 @@ def run_glue_job():
         time.sleep(15)
 
 def run_athena_queries():
-    print("📊 [4/4] Executing Athena Table Creation, Partition Repair, and Analytical Views...")
+    print("📊 [4/5] Executing Athena Table Creation, Partition Repair, and Analytical Views...")
     
     queries = [
         # Create Curated Table DDL
@@ -113,7 +156,7 @@ def run_athena_queries():
 
 if __name__ == "__main__":
     upload_assets()
-    create_glue_database_and_tables()
+    create_glue_database_and_job()
     run_glue_job()
     run_athena_queries()
-    print("🎉 All pipeline steps executed automatically from start to finish!")
+    print("🎉 [5/5] All pipeline steps executed automatically from start to finish!")

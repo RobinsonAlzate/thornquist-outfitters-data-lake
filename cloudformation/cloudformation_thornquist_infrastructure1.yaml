@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  AWS CloudFormation Template for Thornquist Outfitters Data Lake Infrastructure.
+  AWS CloudFormation Template for Thornquist Outfitters S3 Data Lake Bucket.
   Team: Ammar Al-naqeeb, Robinson Alzate Bedoya, Alexander Orsulak.
 
 Parameters:
@@ -8,13 +8,9 @@ Parameters:
     Type: String
     Default: 'thornquist-outfitters-am-rob-alx'
     Description: Standardized S3 Data Lake Bucket Name.
-  AWSAccountId:
-    Type: String
-    Default: '7850-6958-3533'
-    Description: AWS Account ID for IAM LabRole reference.
 
 Resources:
-  # 1. Primary S3 Data Lake Bucket
+  # Primary S3 Data Lake Bucket
   DataLakeBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -26,29 +22,7 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
 
-  # 2. AWS Glue ETL Job
-  ThornquistETLJob:
-    Type: AWS::Glue::Job
-    Properties:
-      Name: thornquist-etl-pipeline
-      Role: !Sub 'arn:aws:iam::${AWSAccountId}:role/LabRole'
-      GlueVersion: '4.0'
-      NumberOfWorkers: 2
-      WorkerType: G.1X
-      Command:
-        Name: glueetl
-        ScriptLocation: !Sub 's3://${BucketName}/scripts/glue_etl_pipeline.py'
-        PythonVersion: '3'
-      DefaultArguments:
-        '--job-bookmark-option': 'job-bookmark-disable'
-        '--enable-metrics': 'true'
-        '--enable-continuous-cloudwatch-log': 'true'
-        '--TempDir': !Sub 's3://${BucketName}/athena-results/temp/'
-
 Outputs:
   S3Bucket:
     Description: Provisioned S3 Data Lake Bucket
     Value: !Ref DataLakeBucket
-  GlueJobName:
-    Description: Created Glue ETL Job Name
-    Value: !Ref ThornquistETLJob
