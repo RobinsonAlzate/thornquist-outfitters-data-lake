@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  AWS CloudFormation Template for Thornquist Outfitters Data Lake & ETL Architecture.
+  AWS CloudFormation Template for Thornquist Outfitters Data Lake Infrastructure.
   Team: Ammar Al-naqeeb, Robinson Alzate Bedoya, Alexander Orsulak.
 
 Parameters:
@@ -11,7 +11,7 @@ Parameters:
   AWSAccountId:
     Type: String
     Default: '7850-6958-3533'
-    Description: AWS Account ID for IAM LabRole and Glue Catalog reference.
+    Description: AWS Account ID for IAM LabRole reference.
 
 Resources:
   # 1. Primary S3 Data Lake Bucket
@@ -26,53 +26,7 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
 
-  # 2. AWS Glue Data Catalog Database con CatalogId explícito requerido por CloudFormation
-  ThornquistGlueDatabase:
-    Type: AWS::Glue::Database
-    Properties:
-      CatalogId: !Ref AWSAccountId
-      DatabaseInput:
-        Name: thornquist_db
-        Description: Conformed and Curated Data Catalog for Thornquist Outfitters.
-
-  # 3. Curated Sales Glue Catalog Table con CatalogId explícito
-  CuratedSalesTable:
-    Type: AWS::Glue::Table
-    Properties:
-      CatalogId: !Ref AWSAccountId
-      DatabaseName: !Ref ThornquistGlueDatabase
-      TableInput:
-        Name: curated_sales
-        TableType: EXTERNAL_TABLE
-        Parameters:
-          classification: parquet
-          parquet.compression: SNAPPY
-        StorageDescriptor:
-          Columns:
-            - Name: order_id
-              Type: string
-            - Name: sale_date
-              Type: string
-            - Name: customer_id
-              Type: string
-            - Name: product_id
-              Type: string
-            - Name: product_name
-              Type: string
-            - Name: unit_price
-              Type: double
-            - Name: quantity
-              Type: int
-          Location: !Sub 's3://${BucketName}/curated/conformed_sales/'
-          InputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
-          OutputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
-          SerdeInfo:
-            SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
-        PartitionKeys:
-          - Name: category
-            Type: string
-
-  # 4. AWS Glue ETL Job
+  # 2. AWS Glue ETL Job
   ThornquistETLJob:
     Type: AWS::Glue::Job
     Properties:
@@ -95,6 +49,6 @@ Outputs:
   S3Bucket:
     Description: Provisioned S3 Data Lake Bucket
     Value: !Ref DataLakeBucket
-  GlueDatabase:
-    Description: Created Glue Catalog Database
-    Value: !Ref ThornquistGlueDatabase
+  GlueJobName:
+    Description: Created Glue ETL Job Name
+    Value: !Ref ThornquistETLJob
