@@ -1,0 +1,1 @@
+SELECT * FROM thornquist_db.curated_sales LIMIT 10;

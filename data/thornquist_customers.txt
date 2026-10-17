@@ -1,0 +1,8 @@
+customer_id|customer_name|province|segment|join_date
+C001|Alex Martin|ON|Retail|2024-05-10
+C002|Jordan Lee|ON|Loyalty|2023-11-18
+C003|Taylor Singh|AB|Loyalty|2025-01-07
+C004|Morgan Chen|BC|Retail|2024-08-22
+C005|Casey Brown|QC|Retail|2025-03-15
+C006|Jamie Wilson|ON|Loyalty|2023-09-30
+C007|Riley Davis|AB|UNKNOWN|2024-12-01

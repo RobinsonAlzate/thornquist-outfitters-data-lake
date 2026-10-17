@@ -1,0 +1,1 @@
+MSCK REPAIR TABLE thornquist_db.curated_sales;

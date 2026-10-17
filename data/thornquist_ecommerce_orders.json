@@ -1,0 +1,62 @@
+[
+  {
+    "orderNumber": "WEB2001",
+    "orderDate": "10/01/2026",
+    "customerId": "C001",
+    "sku": "P101",
+    "product": "Hiking Boots",
+    "productGroup": "Shoes",
+    "province": "ON",
+    "currency": "CAD",
+    "price": 129.99,
+    "qty": 1
+  },
+  {
+    "orderNumber": "WEB2002",
+    "orderDate": "10/02/2026",
+    "customerId": "C003",
+    "sku": "P108",
+    "product": "Headlamp",
+    "productGroup": "Gear",
+    "province": "AB",
+    "currency": "CAD",
+    "price": 39.99,
+    "qty": 2
+  },
+  {
+    "orderNumber": "WEB2003",
+    "orderDate": "10/03/2026",
+    "customerId": "C999",
+    "sku": "P103",
+    "product": "Camping Tent",
+    "productGroup": "Outdoor",
+    "province": "BC",
+    "currency": "CAD",
+    "price": 249.99,
+    "qty": 1
+  },
+  {
+    "orderNumber": "WEB2004",
+    "orderDate": "10/04/2026",
+    "customerId": "UNKNOWN",
+    "sku": "P104",
+    "product": "Rain Jacket",
+    "productGroup": "Clothing",
+    "province": "ON",
+    "currency": "CAD",
+    "price": 119.99,
+    "qty": 1
+  },
+  {
+    "orderNumber": "WEB2005",
+    "orderDate": "10/05/2026",
+    "customerId": "C006",
+    "sku": "P106",
+    "product": "Trekking Poles",
+    "productGroup": "Gear",
+    "province": "QC",
+    "currency": "CAD",
+    "price": 69.99,
+    "qty": 2
+  }
+]

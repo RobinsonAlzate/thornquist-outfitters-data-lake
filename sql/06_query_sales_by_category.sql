@@ -1,0 +1,1 @@
+SELECT * FROM thornquist_db.v_sales_by_category ORDER BY total_revenue DESC;

@@ -1,0 +1,9 @@
+order_id,sale_date,customer_id,product_id,product_name,category,region,currency,unit_price,quantity
+POS1001,2026-10-01,C001,P101,Hiking Boots,Footwear,Ontario,CAD,129.99,1
+POS1002,2026-10-01,C002,P102,Trail Backpack,Packs,Ontario,CAD,89.99,2
+POS1003,2026-10-02,C003,P103,Camping Tent,Camping,Alberta,CAD,249.99,1
+POS1004,2026-10-02,C004,P104,Rain Jacket,Apparel,British Columbia,CAD,119.99,1
+POS1005,2026-10-03,C005,P105,Water Bottle,Accessories,Quebec,CAD,24.99,3
+POS1005,2026-10-03,C005,P105,Water Bottle,Accessories,Quebec,CAD,24.99,3
+POS1006,2026/99/04,C006,P106,Trekking Poles,Accessories,Ontario,CAD,69.99,1
+POS1007,2026-10-04,C007,P107,Sleeping Bag,Camping,Alberta,CAD,159.99,1

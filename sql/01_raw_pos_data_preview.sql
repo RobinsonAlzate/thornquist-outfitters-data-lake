@@ -1,0 +1,1 @@
+SELECT * FROM thornquist_db.pos LIMIT 10;
