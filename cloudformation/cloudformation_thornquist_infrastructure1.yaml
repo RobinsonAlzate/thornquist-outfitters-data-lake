@@ -11,7 +11,7 @@ Parameters:
   AWSAccountId:
     Type: String
     Default: '7850-6958-3533'
-    Description: AWS Account ID for IAM LabRole reference.
+    Description: AWS Account ID for IAM LabRole and Glue Catalog reference.
 
 Resources:
   # 1. Primary S3 Data Lake Bucket
@@ -26,18 +26,20 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
 
-  # 2. AWS Glue Data Catalog Database (Sin CatalogId explícito para evitar errores)
+  # 2. AWS Glue Data Catalog Database con CatalogId explícito requerido por CloudFormation
   ThornquistGlueDatabase:
     Type: AWS::Glue::Database
     Properties:
+      CatalogId: !Ref AWSAccountId
       DatabaseInput:
         Name: thornquist_db
         Description: Conformed and Curated Data Catalog for Thornquist Outfitters.
 
-  # 3. Curated Sales Glue Catalog Table
+  # 3. Curated Sales Glue Catalog Table con CatalogId explícito
   CuratedSalesTable:
     Type: AWS::Glue::Table
     Properties:
+      CatalogId: !Ref AWSAccountId
       DatabaseName: !Ref ThornquistGlueDatabase
       TableInput:
         Name: curated_sales
